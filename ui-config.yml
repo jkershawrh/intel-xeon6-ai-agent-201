@@ -1,0 +1,23 @@
+---
+type: showroom
+
+default_width: 35
+persist_url_state: true
+
+view_switcher:
+  enabled: true
+  default_mode: split
+
+tabs:
+  # Terminal for oc and curl commands
+  - name: Terminal
+    path: /wetty
+    port: 443
+
+  # Solution Architect Agent chat UI
+  - name: Solution Architect
+    url: 'https://solution-ui-${USER}-triforce.${DOMAIN}'
+
+  # OpenShift Console
+  - name: OCP Console
+    url: 'https://console-openshift-console.${DOMAIN}'

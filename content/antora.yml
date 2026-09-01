@@ -1,0 +1,17 @@
+name: modules
+title: "Intel Xeon 6 201 — Building an AI Agent"
+version: ~
+nav:
+  - modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    experimental: true
+    page-pagination: true
+    showroom-collection-version: v1.6.8
+    guid: "%GUID%"
+    user: "%user%"
+    password: "%password%"
+    openshift_api_url: "%openshift_api_url%"
+    openshift_console_url: "%openshift_console_url%"
+    openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
+    project_name: "user-%GUID%-triforce"
