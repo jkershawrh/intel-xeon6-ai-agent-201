@@ -8,14 +8,12 @@ asciidoc:
     experimental: true
     page-pagination: true
     showroom-collection-version: v1.6.8
-    guid: "%GUID%"
+    guid: "%guid%"
     user: "%user%"
     password: "%password%"
     openshift_api_url: "%openshift_api_url%"
     openshift_console_url: "%openshift_console_url%"
     openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
-    # Safe local-build defaults. RHDP Showroom provisioning replaces these
-    # attributes with the generated tenant RACMaaS connection values.
-    litellm_api_endpoint: "INJECTED_BY_RHDP"
-    litellm_virtual_key: "INJECTED_BY_RHDP"
-    project_name: "user-%GUID%-triforce"
+    litellm_api_endpoint: "%maas_url%"
+    litellm_virtual_key: "%litellm_api_key%"
+    project_name: "user-%guid%-triforce"
