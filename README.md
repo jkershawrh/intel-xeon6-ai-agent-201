@@ -12,8 +12,9 @@ RACMaaS virtual key for CPU inference on Intel Xeon 6.
 - This repository owns the learner-facing Showroom content and configuration.
 - [`rhpds/triforce`](https://github.com/rhpds/triforce) remains the implementation
   repository for the application services and deployment manifests.
-- The lab is pinned to the immutable Triforce release
-  [`201-v1.0.0`](https://github.com/rhpds/triforce/releases/tag/201-v1.0.0).
+- The lab's executable manifest URLs are pinned to Triforce commit
+  [`c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d`](https://github.com/rhpds/triforce/commit/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d),
+  the commit referenced by release `201-v1.0.0` at review time.
 
 ## Publishing House migration
 

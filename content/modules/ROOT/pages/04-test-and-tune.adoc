@@ -3,7 +3,9 @@
 
 == Objective
 
-Test the agent with real scenarios, then write your own system prompt for a customer you know. Deploy it, test it, and leave with an agent configured for your territory.
+Test the agent with fictional scenarios, then adapt its system prompt for a
+sanitized opportunity pattern. Deploy the prompt, test the resulting behavior,
+and leave with a reusable agent design rather than customer data.
 
 Set the agent URL from the OpenShift Route so the commands always target this lab order:
 
@@ -68,7 +70,8 @@ curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
 
 == Exercise 2: Write Your Prompt
 
-The system prompt is the agent's expertise. You are going to replace it with one tailored to a customer you know.
+The system prompt is the agent's expertise. You are going to replace it with
+one tailored to a fictional opportunity pattern you understand.
 
 First, read the current prompt:
 
@@ -81,7 +84,7 @@ Now write your own. Pick a customer or industry you work with and fill in this t
 
 [source,bash]
 ----
-# Edit this prompt for YOUR customer scenario, then run the block below to deploy it.
+# Adapt this prompt for a fictional, sanitized scenario, then run the block below to deploy it.
 #
 # Replace the bracketed sections with specifics from your territory:
 # - Who is the customer? (industry, size, region)
@@ -135,12 +138,12 @@ Write a query that matches your customer scenario and test it:
 
 [source,bash]
 ----
-# Replace with YOUR customer's situation:
+# Replace with a fictional, sanitized opportunity:
 ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "YOUR CUSTOMER SCENARIO HERE — describe their workload, constraints, current stack, and budget."
+    "query": "YOUR FICTIONAL SCENARIO HERE — describe the workload, constraints, current stack, and budget without customer-identifying data."
   }' | jq '.brief'
 ----
 
@@ -153,40 +156,12 @@ curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
 * What would you change in the prompt to improve the output? ___
 ****
 
-== Exercise 4: Swap the Model
+The model is assigned to this lab by Launchpad. This exercise changes the
+prompt only; it does not claim that an arbitrary model name is available on the
+shared endpoint. You will record the model actually reported by the live
+inference log in the proof stage.
 
-Try a larger model to see if the recommendation quality improves:
-
-[source,bash,role="execute",subs=attributes+]
-----
-oc set env deploy/solution-agent ADVISOR_MODEL=phi3-mini-cpu
-oc rollout status deploy/solution-agent --timeout=90s
-----
-
-Re-run your customer scenario:
-
-[source,bash]
-----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
-curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "YOUR SAME CUSTOMER SCENARIO"
-  }' | jq '{brief: .brief, inference_log: .inference_log}'
-----
-
-[sidebar]
-****
-*Record:*
-
-* 3B model quality (1-5): ___
-* 3.8B model quality (1-5): ___
-* 3B model inference time: ___ ms
-* 3.8B model inference time: ___ ms
-* Worth the extra latency? ___
-****
-
-== Exercise 5: Your Agent Card
+== Exercise 4: Your Agent Card
 
 Fill in this summary — it captures what you built and what you would show a customer:
 
@@ -198,7 +173,7 @@ Fill in this summary — it captures what you built and what you would show a cu
 
 *System prompt customization*: What did you add or change from the default? ___
 
-*Model selected*: [ ] qwen25-3b-cpu (3B, faster) [ ] phi3-mini-cpu (3.8B, richer)
+*Assigned model observed in the inference log*: ___
 
 *Why*: ___
 
@@ -224,16 +199,15 @@ Fill in this summary — it captures what you built and what you would show a cu
 * [ ] Three canned scenarios returned different recommendations
 * [ ] Custom system prompt deployed and tested
 * [ ] Customer-specific query returned relevant output
-* [ ] Model swap compared (quality + latency)
 * [ ] Agent card filled in
 
 == Learning Outcomes
 
 * The system prompt is the primary control surface — change the persona, process, and output format without touching code
 * Prompt engineering is iterative: write, test, observe, revise
-* Model selection is a quality/latency tradeoff — test both, pick based on your use case
+* Model identity must come from live inference evidence, not from a model name typed into a guide
 * Every change is a ConfigMap or env var — standard Kubernetes operations that any platform team can manage
-* You leave with an agent configured for YOUR customer scenario
+* You leave with an agent configured for a reusable, sanitized opportunity pattern
 
 [.next-nav]
-xref:99-conclusion.adoc[Next: What's Next →]
+xref:05-prove-and-clean.adoc[Next: Prove and Clean Up →]

@@ -12,8 +12,8 @@ By the end, you will understand what makes an agent different from a model, and 
 * Understand the difference between a model (answers questions) and an agent (solves problems)
 * Deploy MCP tools that provide structured data to an agent
 * Deploy a LangGraph agent with a configurable system prompt
-* Test the agent with real customer scenarios
-* Tune agent behavior by swapping models and editing prompts
+* Test the agent with fictional, sanitized opportunity scenarios
+* Tune agent behavior by editing and testing its system prompt
 
 == Why This Matters for You
 
@@ -22,6 +22,18 @@ As a tech seller, you field workload discovery questions daily. This agent demon
 IMPORTANT: Use only fictional or sanitized scenarios in this workshop. Do not enter confidential, regulated, export-controlled, or customer-identifying information.
 
 More broadly: this is how enterprise AI gets built. Not one monolithic model, but a model wrapped in tools and orchestration. This pattern applies to any domain.
+
+== The Journey: Story → Show → Learn → Do → Prove
+
+[cols="1,2,3",options="header"]
+|===
+| Stage | Module | Outcome
+| *Story* | Welcome | Frame a fictional solution-architecture request with human approval and clear data boundaries.
+| *Show* | Anatomy of an Agent | See the business problem and the model, tool, prompt, and workflow boundaries.
+| *Learn* | Deploy the MCP Tools | Inspect the three authoritative data tools before an LLM uses them.
+| *Do* | Wire the Agent + Make It Yours | Deploy the complete agent, run live Intel Xeon inference, and change one bounded control.
+| *Prove* | Prove and Clean Up | Produce a machine-checked proof artifact, inspect the deployment in OpenShift, and remove only what you created.
+|===
 
 == What's Pre-Deployed
 
@@ -71,7 +83,8 @@ A model answers questions. An *agent* uses a model, instructions, and tools to c
 | xref:01-anatomy.adoc[Anatomy of an Agent] | See why a model alone is not enough | ~8 min
 | xref:02-deploy-tools.adoc[Deploy the MCP Tools] | Deploy and test 3 Intel/OpenShift tools | ~12 min
 | xref:03-wire-agent.adoc[Wire the Agent] | Deploy the agent, get your first solution brief | ~15 min
-| xref:04-test-and-tune.adoc[Make It Yours] | Write your own prompt, test with your customer, build your agent card | ~15 min
+| xref:04-test-and-tune.adoc[Make It Yours] | Adapt the prompt, test a sanitized scenario, build your agent card | ~12 min
+| xref:05-prove-and-clean.adoc[Prove and Clean Up] | Verify inference, tools, output, and cleanup with executable checks | ~5 min
 |===
 
 [.next-nav]

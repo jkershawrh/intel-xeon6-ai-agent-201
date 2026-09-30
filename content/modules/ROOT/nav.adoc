@@ -4,6 +4,7 @@
 * xref:02-deploy-tools.adoc[Module 2: Deploy the MCP Tools]
 * xref:03-wire-agent.adoc[Module 3: Wire the Agent]
 * xref:04-test-and-tune.adoc[Module 4: Make It Yours]
+* xref:05-prove-and-clean.adoc[Module 5: Prove and Clean Up]
 
 .Wrap Up
 * xref:99-conclusion.adoc[What's Next]

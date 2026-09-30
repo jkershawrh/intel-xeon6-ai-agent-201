@@ -1,0 +1,137 @@
+= Module 5: Prove and Clean Up
+:navtitle: Prove and Clean Up
+
+== Objective
+
+Turn the lab from “it looked like it worked” into evidence. You will run one
+final sanitized request, machine-check that the response contains a solution
+brief, live model participation, and all three MCP tool calls, then remove only
+the learner-created resources.
+
+== Exercise 1: Capture the Live Proof
+
+Confirm the assigned project and send the final request. The response is saved
+as a portable JSON artifact before anything is removed:
+
+[source,bash,role="execute",subs=attributes+]
+----
+oc project {project_name}
+test "$(oc project -q)" = "{project_name}"
+
+EXPECTED_MODEL="$(oc get deployment solution-agent \
+  -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="ADVISOR_MODEL")].value}')"
+test -n "$EXPECTED_MODEL"
+
+ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+curl -fsS -X POST "$ADVISOR_URL/api/v1/advise" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "A fictional regional manufacturer needs an on-premises assistant for equipment-maintenance planning. Data must remain local, recommendations must cite platform capabilities, and a human engineer approves every action. Produce an illustrative architecture, not customer sizing."
+  }' | tee /tmp/intel-ai-201-proof.json | jq '{
+    brief_preview: (.brief[0:240]),
+    models: [.inference_log[] | select(.model != null) | .model] | unique,
+    tools: [.inference_log[] | select(.tool != null) | .tool] | unique,
+    total_ms
+  }'
+----
+
+The model names above are observations returned by this lab order. They are not
+hard-coded claims about what every cluster serves.
+
+== Exercise 2: Make the Proof Fail Closed
+
+Run executable assertions against the response contract. This block exits
+non-zero if the final answer is empty, any inference record names a model other
+than the one configured in the running Deployment, or the workflow did not call
+all three expected tools:
+
+[source,bash,role="execute"]
+----
+jq -e --arg expected_model "$EXPECTED_MODEL" '
+  (.brief | type == "string" and length > 100) and
+  ([.inference_log[] | select(.model != null)] | length >= 1) and
+  ([.inference_log[] | select(.model != null) | .model] | all(. == $expected_model)) and
+  ([.inference_log[] | select(.tool != null)] | length == 3) and
+  ([.inference_log[] | select(.tool != null) | .tool] | unique | length == 3)
+' /tmp/intel-ai-201-proof.json >/dev/null
+
+echo "PASS: solution brief, assigned model, and three distinct MCP tools are evidenced"
+----
+
+This proves participation, not correctness. The tool data is illustrative and
+the generated brief still requires human validation before customer use.
+
+== Exercise 3: Correlate the Proof in OpenShift
+
+Switch to the *OCP Console* tab and select project `{project_name}`.
+
+. Under *Workloads → Deployments*, confirm `solution-tools`, `solution-agent`,
+  and `solution-ui` are available.
+. Open `solution-agent` and inspect its latest pod logs. Find the request that
+  produced `/tmp/intel-ai-201-proof.json` without exposing Secret values.
+. Under *Networking → Routes*, correlate `solution-agent` with the
+  `ADVISOR_URL` used in the Terminal.
+
+Return to the Terminal and capture a non-secret resource inventory alongside
+the response artifact:
+
+[source,bash,role="execute"]
+----
+mkdir -p "${HOME}/intel-ai-201-proof"
+cp /tmp/intel-ai-201-proof.json "${HOME}/intel-ai-201-proof/response.json"
+oc get deployment,service,route,configmap \
+  -o custom-columns='KIND:.kind,NAME:.metadata.name,READY:.status.readyReplicas' \
+  > "${HOME}/intel-ai-201-proof/resources.txt"
+oc get secret litellm-api-key -o jsonpath='{.metadata.name}{"\n"}' \
+  > "${HOME}/intel-ai-201-proof/credential-reference.txt"
+
+ls -lh "${HOME}/intel-ai-201-proof"
+----
+
+The proof records only the Secret name, never its value.
+
+== Exercise 4: Remove What You Created
+
+The Launchpad order owns the project and the Showroom. Do not delete either.
+Delete only the three application manifests and the connection objects created
+by this lab:
+
+[source,bash,role="execute"]
+----
+oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-ui.yaml --ignore-not-found
+oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-agent.yaml --ignore-not-found
+oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-tools.yaml --ignore-not-found
+oc delete configmap advisor-prompt racmaas-connection --ignore-not-found
+oc delete secret litellm-api-key --ignore-not-found
+----
+
+Prove that cleanup is complete:
+
+[source,bash,role="execute"]
+----
+for resource in \
+  deployment/solution-tools deployment/solution-agent deployment/solution-ui \
+  service/solution-tools service/solution-agent service/solution-ui \
+  route/solution-tools route/solution-agent route/solution-ui \
+  configmap/advisor-prompt configmap/racmaas-connection secret/litellm-api-key
+do
+  if oc get "${resource}" >/dev/null 2>&1; then
+    echo "FAIL: ${resource} still exists"
+    exit 1
+  fi
+done
+
+echo "PASS: learner-created resources removed; project retained"
+----
+
+== Verify
+
+[%interactive]
+* [ ] `/tmp/intel-ai-201-proof.json` contains a non-empty brief
+* [ ] The proof reports at least one observed model and three distinct MCP tools
+* [ ] OpenShift Console correlates the request with the namespace-scoped workload
+* [ ] Proof artifacts contain no Secret value
+* [ ] Learner-created resources are gone and `{project_name}` still exists
+
+[.next-nav]
+xref:99-conclusion.adoc[Next: What This Proved →]

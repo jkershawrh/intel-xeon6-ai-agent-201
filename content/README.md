@@ -11,7 +11,8 @@ The 201 release consists of:
 
 - `content/`, `site.yml`, and `ui-config.yml` in this repository — Showroom
   guide and configuration
-- `infrastructure/manifests-201/` in `rhpds/triforce` release `201-v1.0.0` —
+- `infrastructure/manifests-201/` at `rhpds/triforce` commit
+  `c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d` —
   learner-deployed OpenShift resources
 - `services/solution-tools/`, `services/solution-agent/`, and
   `services/solution-ui/` in `rhpds/triforce` — versioned implementation

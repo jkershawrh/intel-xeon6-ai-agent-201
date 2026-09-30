@@ -16,4 +16,5 @@ asciidoc:
     openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
     litellm_api_endpoint: "%maas_url%"
     litellm_virtual_key: "%litellm_api_key%"
+    maas_model: "%maas_model%"
     project_name: "user-%guid%-triforce"

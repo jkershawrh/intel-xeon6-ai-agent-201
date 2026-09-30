@@ -8,9 +8,10 @@ In 45 minutes, you:
 * Deployed 3 MCP tools that return Intel hardware specs, OpenShift capabilities, and reference architectures
 * Deployed a LangGraph agent that orchestrates LLM reasoning over tool data
 * Generated solution briefs for 3+ customer scenarios
-* Wrote a custom system prompt for YOUR customer and deployed it
-* Compared two models on quality and latency
+* Adapted and deployed a system prompt for a sanitized opportunity pattern
+* Proved the assigned model participated using the live inference log
 * Produced an agent card capturing your configuration and next steps
+* Removed the learner-created workloads without deleting the assigned project
 
 == The Pattern
 
