@@ -43,10 +43,12 @@ class LabExperienceContract(unittest.TestCase):
 
     def test_deployment_uses_the_model_assigned_to_this_order(self):
         wiring = (PAGES / "03-wire-agent.adoc").read_text()
-        component = (ROOT / "content" / "antora.yml").read_text()
 
-        self.assertIn('maas_model: "%maas_model%"', component)
-        self.assertIn("ADVISOR_MODEL='{maas_model}'", wiring)
+        self.assertIn('ADVISOR_MODEL="${MAAS_MODEL}"', wiring)
+        self.assertIn('--from-literal=api-base="${MAAS_ENDPOINT}"', wiring)
+        self.assertIn('--from-literal=api-key="${MAAS_API_KEY}"', wiring)
+        self.assertNotIn("%maas_url%", wiring)
+        self.assertNotIn("%litellm_api_key%", wiring)
 
     def test_workload_manifests_are_pinned_to_an_immutable_commit(self):
         content = "\n".join(path.read_text() for path in PAGES.glob("*.adoc"))
