@@ -7,7 +7,8 @@ Test the agent with fictional scenarios, then adapt its system prompt for a
 sanitized opportunity pattern. Deploy the prompt, test the resulting behavior,
 and leave with a reusable agent design rather than customer data.
 
-Set the agent URL from the OpenShift Route so the commands always target this lab order:
+Set the agent URL to the Service inside your assigned namespace so the Terminal
+commands always target this lab order without depending on edge TLS:
 
 [source,bash,role="execute",subs=attributes+]
 ----
@@ -17,7 +18,7 @@ oc project -q
 
 [source,bash,role="execute"]
 ----
-export ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+export ADVISOR_URL="http://solution-agent:8082"
 ----
 
 == Exercise 1: Three Customer Scenarios
@@ -26,7 +27,7 @@ Run a financial services scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -38,7 +39,7 @@ A manufacturing scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -50,7 +51,7 @@ A cost-savings scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -139,7 +140,7 @@ Write a query that matches your customer scenario and test it:
 [source,bash]
 ----
 # Replace with a fictional, sanitized opportunity:
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{

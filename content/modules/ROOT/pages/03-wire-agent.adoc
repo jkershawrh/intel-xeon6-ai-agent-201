@@ -52,11 +52,11 @@ oc create secret generic litellm-api-key \
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-agent.yaml
+/tmp/apply-triforce-201 solution-agent.yaml solution-agent agent
 oc set env deployment/solution-agent ADVISOR_MODEL='{maas_model}'
 oc rollout status deploy/solution-agent --timeout=90s
 
-export ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+export ADVISOR_URL="http://solution-agent:8082"
 ----
 
 Check the agent's environment:
@@ -81,7 +81,7 @@ Deploy the chat interface:
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-ui.yaml
+/tmp/apply-triforce-201 solution-ui.yaml solution-ui app
 oc rollout status deploy/solution-ui --timeout=60s
 ----
 
@@ -91,7 +91,7 @@ Confirm that the UI Route belongs to the tenant namespace before opening the tab
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc get route solution-ui
+oc get route app
 oc project -q
 ----
 
@@ -115,7 +115,7 @@ Send a request via the terminal:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{

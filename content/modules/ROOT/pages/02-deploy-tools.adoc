@@ -17,8 +17,31 @@ oc project -q
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-tools.yaml
+cat > /tmp/apply-triforce-201 <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+manifest="${1:?manifest}"; source_route="${2:?source route}"; short_route="${3:?short route}"
+base="https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201"
+export SOURCE_ROUTE="$source_route" SHORT_ROUTE="$short_route"
+curl -fsS "$base/$manifest" | python3 -c '
+import os, sys
+text = sys.stdin.read()
+source = "kind: Route\nmetadata:\n  name: " + os.environ["SOURCE_ROUTE"] + "\n"
+target = "kind: Route\nmetadata:\n  name: " + os.environ["SHORT_ROUTE"] + "\n"
+if text.count(source) != 1:
+    raise SystemExit("expected exactly one pinned Triforce Route marker")
+sys.stdout.write(text.replace(source, target, 1))
+' | oc apply -f -
+SH
+chmod 0700 /tmp/apply-triforce-201
+
+/tmp/apply-triforce-201 solution-tools.yaml solution-tools tools
 ----
+
+The helper downloads only the pinned Triforce revision. It preserves the
+Deployment, Service, selectors, ports, image digest, probe, and Route target;
+only the Route object's name becomes the short Launchpad alias. The short name
+keeps the generated OpenShift hostname within its DNS-label limit.
 
 Wait for the pod to be ready:
 
@@ -26,8 +49,14 @@ Wait for the pod to be ready:
 ----
 oc rollout status deploy/solution-tools --timeout=60s
 
-export MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+export MCP_URL="http://solution-tools:8095"
 ----
+
+The Terminal runs inside your assigned namespace, so it calls the Service
+directly. This avoids depending on the cluster's edge certificate and keeps
+the tool exercise inside the seat boundary. Do not add `-k` or
+`--insecure`; the browser-facing Route remains available to the platform, but
+it is not needed for these Terminal calls.
 
 == Exercise 2: List Available Tools
 
@@ -35,7 +64,7 @@ The MCP server exposes tools via JSON-RPC 2.0 -- the same protocol used by Claud
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="http://solution-tools:8095"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}' \
@@ -57,7 +86,7 @@ Look up Intel Xeon 6 processors optimized for AI inference:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="http://solution-tools:8095"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{
@@ -83,7 +112,7 @@ Look up the AI/ML capabilities of the OpenShift platform:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="http://solution-tools:8095"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{
@@ -107,7 +136,7 @@ Get a joint Red Hat + Intel reference architecture for retail:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="http://solution-tools:8095"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{

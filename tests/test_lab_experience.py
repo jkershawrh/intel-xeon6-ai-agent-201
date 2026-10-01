@@ -67,13 +67,55 @@ class LabExperienceContract(unittest.TestCase):
         self.assertIn("Workloads", content)
         self.assertIn("ConfigMaps", content)
 
+    def test_operator_tabs_match_the_guided_journey(self):
+        ui_config = (ROOT / "ui-config.yml").read_text()
+
+        self.assertIn("name: Terminal", ui_config)
+        self.assertIn("name: Solution Architect", ui_config)
+        self.assertIn("name: OCP Console", ui_config)
+        self.assertLess(ui_config.index("name: Terminal"), ui_config.index("name: Solution Architect"))
+        self.assertLess(ui_config.index("name: Solution Architect"), ui_config.index("name: OCP Console"))
+
+    def test_terminal_calls_stay_inside_the_namespace_without_disabling_tls(self):
+        tools = (PAGES / "02-deploy-tools.adoc").read_text()
+        agent = (PAGES / "03-wire-agent.adoc").read_text()
+        tune = (PAGES / "04-test-and-tune.adoc").read_text()
+        proof = (PAGES / "05-prove-and-clean.adoc").read_text()
+        content = "\n".join((tools, agent, tune, proof))
+
+        self.assertIn('MCP_URL="http://solution-tools:8095"', tools)
+        self.assertNotIn("oc get route solution-tools", tools)
+        self.assertIn('ADVISOR_URL="http://solution-agent:8082"', agent)
+        self.assertIn('ADVISOR_URL="http://solution-agent:8082"', tune)
+        self.assertIn('ADVISOR_URL="http://solution-agent:8082"', proof)
+        self.assertIn("`solution-agent` port `8082`", proof)
+        self.assertNotIn("`solution-agent` port `8080`", proof)
+        self.assertNotIn("oc get route solution-agent", "\n".join((agent, tune, proof)))
+        self.assertNotIn("curl -k", content)
+        self.assertNotIn("curl --insecure", content)
+
+    def test_short_route_adapter_preserves_the_pinned_triforce_contract(self):
+        tools = (PAGES / "02-deploy-tools.adoc").read_text()
+        wiring = (PAGES / "03-wire-agent.adoc").read_text()
+        cleanup = (PAGES / "05-prove-and-clean.adoc").read_text()
+
+        assert "c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d" in tools
+        assert "text.count(source) != 1" in tools
+        assert "text.replace(source, target, 1)" in tools
+        assert "/tmp/apply-triforce-201 solution-tools.yaml solution-tools tools" in tools
+        assert "/tmp/apply-triforce-201 solution-agent.yaml solution-agent agent" in wiring
+        assert "/tmp/apply-triforce-201 solution-ui.yaml solution-ui app" in wiring
+        assert "oc get route app" in wiring
+        assert "route/tools route/agent route/app" in cleanup
+        assert "route/solution-tools route/solution-agent route/solution-ui" not in cleanup
+
     def test_cleanup_removes_only_learner_created_resources(self):
         proof = (PAGES / "05-prove-and-clean.adoc").read_text()
 
         for resource in (
-            "solution-ui.yaml",
-            "solution-agent.yaml",
-            "solution-tools.yaml",
+            "deployment/solution-ui service/solution-ui route/app",
+            "deployment/solution-agent service/solution-agent route/agent",
+            "deployment/solution-tools service/solution-tools route/tools",
             "advisor-prompt",
             "racmaas-connection",
             "litellm-api-key",

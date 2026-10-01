@@ -22,7 +22,7 @@ EXPECTED_MODEL="$(oc get deployment solution-agent \
   -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="ADVISOR_MODEL")].value}')"
 test -n "$EXPECTED_MODEL"
 
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="http://solution-agent:8082"
 curl -fsS -X POST "$ADVISOR_URL/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -69,8 +69,9 @@ Switch to the *OCP Console* tab and select project `{project_name}`.
   and `solution-ui` are available.
 . Open `solution-agent` and inspect its latest pod logs. Find the request that
   produced `/tmp/intel-ai-201-proof.json` without exposing Secret values.
-. Under *Networking → Routes*, correlate `solution-agent` with the
-  `ADVISOR_URL` used in the Terminal.
+. Under *Networking → Services*, correlate `solution-agent` port `8082` with
+  the namespace-local `ADVISOR_URL` used in the Terminal. Then inspect the
+  short `agent` Route as the browser-facing edge entry point.
 
 Return to the Terminal and capture a non-secret resource inventory alongside
 the response artifact:
@@ -98,9 +99,9 @@ by this lab:
 
 [source,bash,role="execute"]
 ----
-oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-ui.yaml --ignore-not-found
-oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-agent.yaml --ignore-not-found
-oc delete -f https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201/solution-tools.yaml --ignore-not-found
+oc delete deployment/solution-ui service/solution-ui route/app --ignore-not-found
+oc delete deployment/solution-agent service/solution-agent route/agent --ignore-not-found
+oc delete deployment/solution-tools service/solution-tools route/tools --ignore-not-found
 oc delete configmap advisor-prompt racmaas-connection --ignore-not-found
 oc delete secret litellm-api-key --ignore-not-found
 ----
@@ -112,7 +113,7 @@ Prove that cleanup is complete:
 for resource in \
   deployment/solution-tools deployment/solution-agent deployment/solution-ui \
   service/solution-tools service/solution-agent service/solution-ui \
-  route/solution-tools route/solution-agent route/solution-ui \
+  route/tools route/agent route/app \
   configmap/advisor-prompt configmap/racmaas-connection secret/litellm-api-key
 do
   if oc get "${resource}" >/dev/null 2>&1; then
