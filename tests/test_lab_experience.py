@@ -44,11 +44,30 @@ class LabExperienceContract(unittest.TestCase):
     def test_deployment_uses_the_model_assigned_to_this_order(self):
         wiring = (PAGES / "03-wire-agent.adoc").read_text()
 
-        self.assertIn('ADVISOR_MODEL="${MAAS_MODEL}"', wiring)
-        self.assertIn('--from-literal=api-base="${MAAS_ENDPOINT}"', wiring)
-        self.assertIn('--from-literal=api-key="${MAAS_API_KEY}"', wiring)
+        # Braces collide with Antora attribute substitution because the
+        # corresponding lowercase attributes are supplied in antora.yml.
+        self.assertIn('ADVISOR_MODEL="$MAAS_MODEL"', wiring)
+        self.assertIn('--from-literal=api-base="$MAAS_ENDPOINT"', wiring)
+        self.assertIn('--from-literal=api-key="$MAAS_API_KEY"', wiring)
+        self.assertNotIn('${MAAS_MODEL}', wiring)
+        self.assertNotIn('${MAAS_ENDPOINT}', wiring)
+        self.assertNotIn('${MAAS_API_KEY}', wiring)
         self.assertNotIn("%maas_url%", wiring)
         self.assertNotIn("%litellm_api_key%", wiring)
+
+    def test_showroom_uses_the_launchpad_partnership_header(self):
+        supplemental = ROOT / "content" / "supplemental-ui"
+        header = (supplemental / "partials" / "header-content.hbs").read_text()
+        css = (supplemental / "css" / "site-extra.css").read_text()
+        site = (ROOT / "site.yml").read_text()
+
+        self.assertIn("supplemental_files: ./content/supplemental-ui", site)
+        self.assertIn("Red Hat and Intel AI Launchpad home", header)
+        self.assertIn("logo-demo-platform.svg", header)
+        self.assertIn("intel-logo.svg", header)
+        self.assertIn("launchpad-showroom-title", header)
+        self.assertIn(".launchpad-showroom-brand", css)
+        self.assertTrue((supplemental / "img" / "intel-logo.svg").is_file())
 
     def test_workload_manifests_are_pinned_to_an_immutable_commit(self):
         content = "\n".join(path.read_text() for path in PAGES.glob("*.adoc"))

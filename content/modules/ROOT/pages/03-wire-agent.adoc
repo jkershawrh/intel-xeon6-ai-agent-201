@@ -42,18 +42,18 @@ The lab provisioner has already generated and assigned a short-lived, model-scop
 [source,bash,role="execute",subs=attributes+]
 ----
 oc create configmap racmaas-connection \
-  --from-literal=api-base="${MAAS_ENDPOINT}" \
+  --from-literal=api-base="$MAAS_ENDPOINT" \
   --dry-run=client -o yaml | oc apply -f -
 
 oc create secret generic litellm-api-key \
-  --from-literal=api-key="${MAAS_API_KEY}" \
+  --from-literal=api-key="$MAAS_API_KEY" \
   --dry-run=client -o yaml | oc apply -f -
 ----
 
 [source,bash,role="execute",subs=attributes+]
 ----
 /tmp/apply-triforce-201 solution-agent.yaml solution-agent agent
-oc set env deployment/solution-agent ADVISOR_MODEL="${MAAS_MODEL}"
+oc set env deployment/solution-agent ADVISOR_MODEL="$MAAS_MODEL"
 oc rollout status deploy/solution-agent --timeout=90s
 
 export ADVISOR_URL="http://solution-agent:8082"
