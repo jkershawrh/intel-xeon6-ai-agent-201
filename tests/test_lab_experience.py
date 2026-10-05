@@ -75,7 +75,7 @@ class LabExperienceContract(unittest.TestCase):
         self.assertNotIn("raw.githubusercontent.com/rhpds/triforce/201-v1.0.0", content)
         self.assertIn(
             "raw.githubusercontent.com/rhpds/triforce/"
-            "c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d",
+            "f484cb66c3dcddff323df8814f637dc92c73c179",
             content,
         )
 
@@ -120,7 +120,7 @@ class LabExperienceContract(unittest.TestCase):
         wiring = (PAGES / "03-wire-agent.adoc").read_text()
         cleanup = (PAGES / "05-prove-and-clean.adoc").read_text()
 
-        assert "c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d" in tools
+        assert "f484cb66c3dcddff323df8814f637dc92c73c179" in tools
         assert "text.count(source) != 1" in tools
         assert "text.replace(source, target, 1)" in tools
         assert "/tmp/apply-triforce-201 solution-tools.yaml solution-tools tools" in tools

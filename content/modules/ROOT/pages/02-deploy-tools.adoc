@@ -21,7 +21,7 @@ cat > /tmp/apply-triforce-201 <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
 manifest="${1:?manifest}"; source_route="${2:?source route}"; short_route="${3:?short route}"
-base="https://raw.githubusercontent.com/rhpds/triforce/c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d/infrastructure/manifests-201"
+base="https://raw.githubusercontent.com/rhpds/triforce/f484cb66c3dcddff323df8814f637dc92c73c179/infrastructure/manifests-201"
 export SOURCE_ROUTE="$source_route" SHORT_ROUTE="$short_route"
 curl -fsS "$base/$manifest" | python3 -c '
 import os, sys
