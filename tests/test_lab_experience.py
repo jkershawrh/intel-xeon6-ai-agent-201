@@ -63,10 +63,14 @@ class LabExperienceContract(unittest.TestCase):
 
         self.assertIn("supplemental_files: ./content/supplemental-ui", site)
         self.assertIn("Red Hat and Intel AI Launchpad home", header)
-        self.assertIn("logo-demo-platform.svg", header)
+        self.assertIn("redhat-logo.svg", header)
         self.assertIn("intel-logo.svg", header)
         self.assertIn("launchpad-showroom-title", header)
         self.assertIn(".launchpad-showroom-brand", css)
+        self.assertIn(".launchpad-showroom-redhat", css)
+        self.assertIn("height: 2rem", css)
+        self.assertIn("height: 1.55rem", css)
+        self.assertTrue((supplemental / "img" / "redhat-logo.svg").is_file())
         self.assertTrue((supplemental / "img" / "intel-logo.svg").is_file())
 
     def test_workload_manifests_are_pinned_to_an_immutable_commit(self):

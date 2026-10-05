@@ -25,10 +25,10 @@
   text-decoration: none;
 }
 
-.launchpad-showroom-rhdp {
+.launchpad-showroom-redhat {
   display: block;
-  height: 1.55rem;
-  max-width: 13rem;
+  height: 2rem;
+  max-width: 10.5rem;
   width: auto;
 }
 
@@ -40,7 +40,7 @@
 
 .launchpad-showroom-intel {
   display: block;
-  height: 1.15rem;
+  height: 1.55rem;
   width: auto;
 }
 
@@ -67,13 +67,13 @@
     padding-right: 0.65rem;
   }
 
-  .launchpad-showroom-rhdp {
-    height: 1.25rem;
-    max-width: 10.5rem;
+  .launchpad-showroom-redhat {
+    height: 1.75rem;
+    max-width: 9.25rem;
   }
 
   .launchpad-showroom-intel {
-    height: 1rem;
+    height: 1.35rem;
   }
 
   .launchpad-showroom-title {
