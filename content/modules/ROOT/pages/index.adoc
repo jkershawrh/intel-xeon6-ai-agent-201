@@ -48,26 +48,18 @@ Your environment has RACMaaS shared model inference and an empty namespace. You 
 
 == Connect to Your Lab Project
 
-The Terminal starts with access only to its own Showroom namespace. Log in as the OpenShift user generated for this lab order:
+Launchpad has already authenticated the Terminal with a namespace-scoped identity for this seat. Do not run `oc login` with a shared cluster credential.
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc login --insecure-skip-tls-verify \
-  -u {user} \
-  -p {password} \
-  {openshift_api_url}
-----
-
-Select the tenant project generated for this order:
-
-[source,bash,role="execute",subs=attributes+]
-----
-oc project {project_name}
 oc whoami
+oc project {project_name}
 oc project -q
+oc auth can-i create deployments.apps -n {project_name}
+oc auth can-i get nodes
 ----
 
-The final command must show `{project_name}`. The project name and user change with every lab order; always use the values rendered in your current guide.
+The project command must show `{project_name}`. Creating deployments in that namespace must return `yes`; reading cluster nodes must return `no` or `Forbidden`. These checks prove that the Terminal can build the lab without receiving cluster-wide authority.
 
 == The Agent Pattern
 

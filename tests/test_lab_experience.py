@@ -92,6 +92,16 @@ class LabExperienceContract(unittest.TestCase):
         self.assertIn("Workloads", content)
         self.assertIn("ConfigMaps", content)
 
+    def test_terminal_is_pre_authenticated_and_namespace_scoped(self):
+        welcome = (PAGES / "index.adoc").read_text()
+
+        self.assertIn("already authenticated", welcome)
+        self.assertIn("oc whoami", welcome)
+        self.assertIn("oc auth can-i create deployments.apps", welcome)
+        self.assertIn("oc auth can-i get nodes", welcome)
+        self.assertNotIn("oc login --insecure", welcome)
+        self.assertNotIn("{password}", welcome)
+
     def test_operator_tabs_match_the_guided_journey(self):
         ui_config = (ROOT / "ui-config.yml").read_text()
 
