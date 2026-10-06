@@ -78,6 +78,18 @@ class LabExperienceContract(unittest.TestCase):
         self.assertTrue((supplemental / "img" / "redhat-logo.svg").is_file())
         self.assertTrue((supplemental / "img" / "intel-logo.svg").is_file())
 
+    def test_execute_buttons_use_the_embedded_terminal_message_bridge(self):
+        supplemental = ROOT / "content" / "supplemental-ui"
+        head = (supplemental / "partials" / "head-meta.hbs").read_text()
+        bridge_path = supplemental / "js" / "terminal-execute.js"
+
+        self.assertTrue(bridge_path.is_file())
+        bridge = bridge_path.read_text()
+        self.assertIn(".paste-button", bridge)
+        self.assertIn("frame.contentWindow.postMessage", bridge)
+        self.assertIn("client.sendData", bridge)
+        self.assertIn("terminal-execute.js", head)
+
     def test_workload_manifests_are_pinned_to_an_immutable_commit(self):
         content = "\n".join(path.read_text() for path in PAGES.glob("*.adoc"))
 
