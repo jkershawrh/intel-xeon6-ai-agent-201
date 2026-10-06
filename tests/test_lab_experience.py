@@ -58,6 +58,7 @@ class LabExperienceContract(unittest.TestCase):
     def test_showroom_uses_the_launchpad_partnership_header(self):
         supplemental = ROOT / "content" / "supplemental-ui"
         header = (supplemental / "partials" / "header-content.hbs").read_text()
+        head = (supplemental / "partials" / "head-meta.hbs").read_text()
         css = (supplemental / "css" / "site-extra.css").read_text()
         site = (ROOT / "site.yml").read_text()
 
@@ -66,6 +67,10 @@ class LabExperienceContract(unittest.TestCase):
         self.assertIn("redhat-logo.svg", header)
         self.assertIn("intel-logo.svg", header)
         self.assertIn("launchpad-showroom-title", header)
+        self.assertIn(
+            '<link rel="stylesheet" href="{{uiRootPath}}/css/site-extra.css">',
+            head,
+        )
         self.assertIn(".launchpad-showroom-brand", css)
         self.assertIn(".launchpad-showroom-redhat", css)
         self.assertIn("height: 2rem", css)
