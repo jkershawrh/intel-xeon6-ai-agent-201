@@ -8,30 +8,6 @@
     }) || null
   }
 
-  function installListener (frame) {
-    if (frame.dataset.launchpadExecuteListener === 'true') return
-
-    const script = frame.contentDocument.createElement('script')
-    script.textContent = `
-      (function () {
-        if (window.__launchpadExecuteListener) return;
-        window.__launchpadExecuteListener = true;
-        window.addEventListener('message', function (event) {
-          if (!event.data || event.data.type !== 'execute') return;
-          var command = String(event.data.data || '').replace(/[\\r\\n]+$/, '');
-          if (window.client && typeof window.client.sendData === 'function') {
-            window.client.sendData(command + '\\r');
-            return;
-          }
-          if (window.term && window.term._core && window.term._core._onData) {
-            window.term._core._onData.fire(command + '\\r');
-          }
-        }, false);
-      })();`
-    frame.contentDocument.body.appendChild(script)
-    frame.dataset.launchpadExecuteListener = 'true'
-  }
-
   document.addEventListener('click', function (event) {
     const button = event.target.closest('.paste-button')
     if (!button) return
@@ -40,10 +16,32 @@
     const frame = terminalFrame()
     if (!code || !frame || !frame.contentDocument) return
 
+    const textarea = frame.contentDocument.querySelector('.xterm-helper-textarea') ||
+      frame.contentDocument.querySelector('textarea')
+    if (!textarea) return
+
+    const command = code.innerText.replace(/[\r\n]+$/, '')
+
     event.preventDefault()
     event.stopImmediatePropagation()
-    installListener(frame)
-    frame.contentWindow.postMessage({ type: 'execute', data: code.innerText + '\r' }, '*')
+    textarea.focus()
+    textarea.value = command
+    textarea.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      data: command,
+      inputType: 'insertText'
+    }))
+    textarea.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Enter',
+      code: 'Enter',
+      keyCode: 13,
+      which: 13
+    }))
     button.classList.add('clicked')
     window.setTimeout(function () { button.classList.remove('clicked') }, 500)
   }, true)

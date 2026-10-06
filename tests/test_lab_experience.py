@@ -78,7 +78,7 @@ class LabExperienceContract(unittest.TestCase):
         self.assertTrue((supplemental / "img" / "redhat-logo.svg").is_file())
         self.assertTrue((supplemental / "img" / "intel-logo.svg").is_file())
 
-    def test_execute_buttons_use_the_embedded_terminal_message_bridge(self):
+    def test_execute_buttons_drive_the_embedded_terminal_input(self):
         supplemental = ROOT / "content" / "supplemental-ui"
         head = (supplemental / "partials" / "head-meta.hbs").read_text()
         bridge_path = supplemental / "js" / "terminal-execute.js"
@@ -86,8 +86,11 @@ class LabExperienceContract(unittest.TestCase):
         self.assertTrue(bridge_path.is_file())
         bridge = bridge_path.read_text()
         self.assertIn(".paste-button", bridge)
-        self.assertIn("frame.contentWindow.postMessage", bridge)
-        self.assertIn("client.sendData", bridge)
+        self.assertIn(".xterm-helper-textarea", bridge)
+        self.assertIn("textarea.value = command", bridge)
+        self.assertIn("new InputEvent('input'", bridge)
+        self.assertIn("new KeyboardEvent('keydown'", bridge)
+        self.assertNotIn("frame.contentWindow.postMessage", bridge)
         self.assertIn("terminal-execute.js", head)
 
     def test_workload_manifests_are_pinned_to_an_immutable_commit(self):
